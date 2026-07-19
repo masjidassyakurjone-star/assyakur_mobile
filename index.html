@@ -3,12 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Display Masjid Assyakur - Portrait Monitor</title>
+    <title>Display Masjid Assyakur - Mobile Version</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Load CSS Eksternal -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- OVERLAY PERINGATAN ROTASI LAYAR (Hanya Muncul Jika Landscape) -->
+    <div id="screen-rotate-warning">
+        <div class="warning-rotate-content">
+            <div class="rotate-icon">🔄</div>
+            <h2>Mohon Putar HP Anda</h2>
+            <p>Aplikasi ini didesain optimal untuk tampilan mode **PORTRAIT**.</p>
+        </div>
+    </div>
+
+    <!-- KONTAINER UTAMA SIGNAGE PORTRAIT MOBILE -->
     <div class="signage-container-portrait">
         
         <!-- HEADER -->
@@ -29,7 +41,7 @@
                 <div class="hijri-display" id="clock-hijri">Memuat Hijriyah...</div>
             </div>
             
-            <!-- WIDGET KANAN: Tampilan Mengikuti Model Lama -->
+            <!-- WIDGET KANAN: Countdown Tampilan Lama -->
             <div class="card-portrait card-countdown-portrait">
                 <div class="countdown-status" id="countdown-title">WAKTU SHOLAT --</div>
                 <div class="countdown-sholat-time" id="countdown-sholat-jam">--:--</div>
@@ -52,12 +64,12 @@
 
         <!-- MANUAL CONTROL PANEL -->
         <div class="papan-control-panel">
-            <button class="ctrl-btn" onclick="kembaliSlideManual()">⏮️ Sebelumnya</button>
+            <button class="ctrl-btn" onclick="kembaliSlideManual()">⏮️ Sebelum</button>
             <button class="ctrl-btn" id="btn-pause-play" onclick="toggleJedaOtomatis()">⏸️ Jeda</button>
-            <button class="ctrl-btn" onclick="lanjutSlideManual()">Berikutnya ⏭️</button>
+            <button class="ctrl-btn" onclick="lanjutSlideManual()">Berikut ⏭️</button>
         </div>
 
-        <!-- REKENING CARD -->
+        <!-- REKENING INFAQ CARD -->
         <section class="card-rekening-portrait">
             <div class="rekening-title">INFAQ MASJID</div>
             <div class="rekening-info-block">
@@ -71,7 +83,7 @@
             <div class="running-text-wrapper">
                 <div class="running-text-label">Kutipan Pilihan</div>
                 <div class="marquee-container">
-                    <marquee scrollamount="5" id="running-text">Memuat isi kutipan...</marquee>
+                    <marquee scrollamount="3" id="running-text">Memuat isi kutipan...</marquee>
                 </div>
             </div>
         </footer>
@@ -85,6 +97,13 @@
 
     <script>
         let isJedaManual = false;
+
+        // KUNCI ORIENTASI PORTRAIT PADA BROWSER SMARTPHONE YANG MENDUKUNG
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait').catch(function(error) {
+                console.log("Kunci orientasi otomatis ditolak browser sistem (memerlukan mode PWA/Fullscreen):", error);
+            });
+        }
 
         function toggleJedaOtomatis() {
             const btn = document.getElementById('btn-pause-play');
