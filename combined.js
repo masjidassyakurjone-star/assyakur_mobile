@@ -115,7 +115,7 @@ let menggunakanSlideA = true;
 
 setInterval(() => {
     const sekarang = new Date();
-    const jam = ThermalJam = sekarang.getHours();     
+    const jam = sekarang.getHours();     
     const menit = sekarang.getMinutes(); 
     const detik = sekarang.getSeconds(); 
     const sekarangDetik = (jam * 3600) + (menit * 60) + detik;
@@ -236,21 +236,22 @@ function tampilkanInterupsiIqamahPapan(namaSholat, stringWaktu) {
     const slideB = document.getElementById('slide-B');
     if (!slideA || !slideB) return;
 
+    // KOREKSI IQAMAH MOBILE: Angka countdown diturunkan ke 9vh, teks arab dan terjemahan disusun rapi proporsional HP
     const htmlIqamahMenyolok = `
-        <div class="padded-slide-inner" style="justify-content: center; align-items: center; background: #03150d; height: 100%; padding: 2vh 2vw;">
-            <div style="font-size: 4vh; color: #e5c158; font-weight: 700; letter-spacing: 0.2vh; text-transform: uppercase; margin-bottom: 0.5vh;">MENUNGGU IQAMAH SHOLAT</div>
-            <div style="font-size: 7.5vh; color: #ffffff; font-weight: 800; margin-bottom: 2vh; text-transform: uppercase; letter-spacing: 0.1vh; line-height: 1;">${namaSholat}</div>
+        <div class="padded-slide-inner" style="justify-content: center; align-items: center; background: #03150d; height: 100%; padding: 1.5vh 3vw;">
+            <div style="font-size: 2vh; color: #e5c158; font-weight: 700; letter-spacing: 0.1vh; text-transform: uppercase; margin-bottom: 0.2vh;">MENUNGGU IQAMAH</div>
+            <div style="font-size: 3.5vh; color: #ffffff; font-weight: 800; margin-bottom: 1vh; text-transform: uppercase; letter-spacing: 0.05vh; line-height: 1;">${namaSholat}</div>
             
-            <div style="font-size: 14vh; font-weight: 900; color: #ff5252; background: rgba(255, 0, 0, 0.15); border: 0.5vh solid #ff5252; padding: 0.2vh 7vw; border-radius: 2vh; line-height: 1.15; font-variant-numeric: tabular-nums; margin-bottom: 2.5vh; box-shadow: 0 0 3vh rgba(255, 82, 82, 0.3);">
+            <div style="font-size: 9vh; font-weight: 900; color: #ff5252; background: rgba(255, 0, 0, 0.15); border: 0.3vh solid #ff5252; padding: 0.2vh 6vw; border-radius: 1.5vh; line-height: 1.1; font-variant-numeric: tabular-nums; margin-bottom: 1.5vh; box-shadow: 0 0 2vh rgba(255, 82, 82, 0.3);">
                 ${stringWaktu}
             </div>
             
-            <div style="width: 100%; background: rgba(0,0,0,0.4); padding: 2vh 2vw; border-radius: 1.5vh; border: 0.2vh solid rgba(229,193,88,0.3); text-align: center;">
-                <div style="font-family: 'Amiri', serif; font-size: 4vh; color: #e5c158; direction: rtl; line-height: 1.5; margin-bottom: 1.5vh; font-weight: 700; letter-spacing: 0;">
-                    حَدَّثَنَا مُحَمَّدُ بْنُ كَثِيرٍ... عَنْ أَنَسِ بْنِ مَالِكٍ, قَالَ قَالَ رَسُولُ اللَّهِ ﷺ ‏"‏ لاَ يُرَدُّ الدُّعَاءُ بَيْنَ الأَذَانِ وَالإِقَAMAH ‏"‏ ‏.‏
+            <div style="width: 100%; background: rgba(0,0,0,0.4); padding: 1.5vh 2.5vw; border-radius: 1vh; border: 0.18vh solid rgba(229,193,88,0.25); text-align: center;">
+                <div style="font-family: 'Amiri', serif; font-size: 2.3vh; color: #e5c158; direction: rtl; line-height: 1.4; margin-bottom: 1vh; font-weight: 700; letter-spacing: 0;">
+                    لاَ يُرَدُّ الدُّعَاءُ بَيْنَ الأَذَانِ وَالإِقَامَةِ
                 </div>
-                <div style="font-family: 'Montserrat', sans-serif; font-size: 2.4vh; color: #ffffff; font-weight: 600; line-height: 1.4; font-style: italic; letter-spacing: 0.02vh;">
-                    Diriwayatkan Anas bin Malik: "Doa yang dipanjatkan antara adzan dan iqamah tidak akan ditolak."
+                <div style="font-family: 'Montserrat', sans-serif; font-size: 1.5vh; color: #ffffff; font-weight: 600; line-height: 1.3; font-style: italic;">
+                    "Doa antara adzan dan iqamah tidak akan ditolak."
                 </div>
             </div>
         </div>
@@ -389,15 +390,14 @@ function bangunStrukturSlideAntrian() {
     let immJmt = (dataJumat[2] && dataJumat[2][1]) ? dataJumat[2][1] : '-';
     let bilJmt = (dataJumat[3] && dataJumat[3][1]) ? dataJumat[3][1] : '-';
     
-    // KOREKSI UTAMA: Pengaturan perataan tengah dipasang langsung (Inline Style) pada struktur data mading Jumat
     dataSlides.push({
         tipe: 'TEKS_JUMAT',
         durasi: 15000,
         html: `
-            <div class="padded-slide-inner-jumat" style="width:100%; height:100%; padding:3vh 4vw; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <div class="padded-slide-inner-jumat" style="width:100%; height:100%; padding:2vh 4vw; display:flex; flex-direction:column; justify-content:center; align-items:center;">
                 <div class="judul-jumat-besar">SHOLAT JUMAT</div>
                 <div class="tanggal-jumat-besar">${tglJmt}</div>
-                <div style="display:flex; justify-content:center; align-items:center; width:100%; margin-top:2vh;">
+                <div style="display:flex; justify-content:center; align-items:center; width:100%; margin-top:1vh;">
                     <table class="tabel-jumat-tv">
                         <tr><td>Khatib Jumat</td><td>:</td><td>${khtJmt}</td></tr>
                         <tr><td>Imam Sholat</td><td>:</td><td>${immJmt}</td></tr>
@@ -412,24 +412,24 @@ function bangunStrukturSlideAntrian() {
         tipe: 'SALDO_JUMAT',
         durasi: 15000,
         html: `
-            <div class="padded-slide-inner" style="justify-content: space-between; padding: 2vh 2vw; height: 100%;">
-                <div style="background: rgba(0,0,0,0.25); border: 0.18vh solid rgba(229,193,88,0.3); border-radius: 1vh; width: 100%; padding: 1.2vh; text-align: center;">
-                    <span style="font-size: 2vh; color: #a2bcae; display: block; font-weight: 600;">Saldo Jumat Lalu</span>
-                    <strong style="font-size: 3.5vh; color: #ffffff; font-weight: 700; margin-top: 0.5vh; display: block; white-space: nowrap;">${saldoAwal}</strong>
+            <div class="padded-slide-inner" style="justify-content: space-between; padding: 1.5vh 2vw; height: 100%;">
+                <div style="background: rgba(0,0,0,0.25); border: 0.18vh solid rgba(229,193,88,0.3); border-radius: 1vh; width: 100%; padding: 1vh; text-align: center;">
+                    <span style="font-size: 1.8vh; color: #a2bcae; display: block; font-weight: 600;">Saldo Jumat Lalu</span>
+                    <strong style="font-size: 2.8vh; color: #ffffff; font-weight: 700; margin-top: 0.3vh; display: block; white-space: nowrap;">${saldoAwal}</strong>
                 </div>
                 <div style="display: flex; gap: 1.5vw; width: 100%;">
-                    <div style="flex: 1; background: rgba(46, 204, 113, 0.1); border: 0.18vh solid rgba(46, 204, 113, 0.4); border-radius: 1vh; padding: 1.2vh; text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                        <span style="font-size: 1.9vh; color: #2ecc71; display: block; font-weight: 600; margin-bottom: 0.5vh;">Penerimaan</span>
-                        <strong style="font-size: 2.5vh; color: #ffffff; font-weight: 700; display: block; white-space: nowrap;">${"Rp " + totalPemasukan.toLocaleString('id-ID')}</strong>
+                    <div style="flex: 1; background: rgba(46, 204, 113, 0.1); border: 0.18vh solid rgba(46, 204, 113, 0.4); border-radius: 1vh; padding: 1vh; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                        <span style="font-size: 1.6vh; color: #2ecc71; display: block; font-weight: 600; margin-bottom: 0.3vh;">Masuk</span>
+                        <strong style="font-size: 2.1vh; color: #ffffff; font-weight: 700; display: block; white-space: nowrap;">${"Rp " + totalPemasukan.toLocaleString('id-ID')}</strong>
                     </div>
-                    <div style="flex: 1; background: rgba(231, 76, 60, 0.1); border: 0.18vh solid rgba(231, 76, 60, 0.4); border-radius: 1vh; padding: 1.2vh; text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                        <span style="font-size: 1.9vh; color: #e74c3c; display: block; font-weight: 600; margin-bottom: 0.5vh;">Pengeluaran</span>
-                        <strong style="font-size: 2.5vh; color: #ffffff; font-weight: 700; display: block; white-space: nowrap;">${"Rp " + totalPengeluaran.toLocaleString('id-ID')}</strong>
+                    <div style="flex: 1; background: rgba(231, 76, 60, 0.1); border: 0.18vh solid rgba(231, 76, 60, 0.4); border-radius: 1vh; padding: 1vh; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                        <span style="font-size: 1.6vh; color: #e74c3c; display: block; font-weight: 600; margin-bottom: 0.3vh;">Keluar</span>
+                        <strong style="font-size: 2.1vh; color: #ffffff; font-weight: 700; display: block; white-space: nowrap;">${"Rp " + totalPengeluaran.toLocaleString('id-ID')}</strong>
                     </div>
                 </div>
-                <div style="background: linear-gradient(180deg, rgba(11,48,28,0.95) 0%, rgba(5,25,14,0.98) 100%); border: 0.25vh solid #e5c158; border-radius: 1.2vh; width: 100%; padding: 1.8vh; text-align: center;">
-                    <span style="font-size: 2.2vh; color: #e5c158; display: block; font-weight: 600;">SALDO SEKARANG</span>
-                    <strong style="font-size: 4.5vh; color: #ffffff; font-weight: 800; margin-top: 0.5vh; display: block; white-space: nowrap;">${saldoAkhir}</strong>
+                <div style="background: linear-gradient(180deg, rgba(11,48,28,0.95) 0%, rgba(5,25,14,0.98) 100%); border: 0.25vh solid #e5c158; border-radius: 1.2vh; width: 100%; padding: 1.3vh; text-align: center;">
+                    <span style="font-size: 2vh; color: #e5c158; display: block; font-weight: 600;">SALDO SEKARANG</span>
+                    <strong style="font-size: 3.5vh; color: #ffffff; font-weight: 800; margin-top: 0.3vh; display: block; white-space: nowrap;">${saldoAkhir}</strong>
                 </div>
             </div>
         `
@@ -453,20 +453,20 @@ function bangunStrukturSlideAntrian() {
             tipe: 'TABEL_KAS',
             durasi: 25000,
             html: `
-                <div class="padded-slide-inner">
-                    <div style="font-size:3vh; color:#e5c158; border-bottom:0.18vh dashed rgba(229,193,88,0.4); padding-bottom:1vh; margin-bottom:2vh; font-weight:700; text-align:center; line-height: 1.2;">
-                        <div style="display: block;">LAPORAN KAS</div>
-                        <div style="display: block;">KEUANGAN MASJID</div>
+                <div class="padded-slide-inner" style="padding: 1.5vh 2vw;">
+                    <div style="font-size:2.2vh; color:#e5c158; border-bottom:0.18vh dashed rgba(229,193,88,0.4); padding-bottom:0.5vh; margin-bottom:1vh; font-weight:700; text-align:center; line-height: 1.2;">
+                        LAPORAN KAS MASJID
                     </div>
                     <div class="scrollable-content table-responsive">
                         <table class="table-kas">
-                            <thead><tr><th>TANGGAL</th><th>KETERANGAN REKENING</th><th>MASUK</th><th>KELUAR</th><th>SALDO</th></tr></thead>
+                            <thead><tr><th>TGL</th><th>URAIAN TRANSAKSI</th><th>MASUK</th><th>KELUAR</th><th>SALDO</th></tr></thead>
                             <tbody>${tableRowsHtml}</tbody>
-                </table>
-            </div>
-        </div>
-    `
-   });    }
+                        </table>
+                    </div>
+                </div>
+            `
+        });    
+    }
 
     inisialisasiPerputaranPapan();
 }
@@ -474,7 +474,6 @@ function bangunStrukturSlideAntrian() {
 function tambahkanItemGambarDinamis() {
     if (DAFTAR_GAMBAR_LOKAL.length === 0) return;
     const namaFileGambar = DAFTAR_GAMBAR_LOKAL[globalImageIndex % DAFTAR_GAMBAR_LOKAL.length];
-    
     const urlGambarGithubTV = `https://raw.githubusercontent.com/verypriasetia/masjid-assyakur/main/image/${namaFileGambar}`;
     
     dataSlides.push({
@@ -490,7 +489,7 @@ function tambahkanItemTeksDinamis(teksMurni) {
         dataSlides.push({
             tipe: 'TEKS_PENGUMUMAN',
             durasi: 15000,
-            html: `<div class="padded-slide-inner" style="justify-content:center; align-items:center;"><div class="scrollable-content info-text-content" style="padding-top:2vh; text-align: left; white-space: pre-wrap;">Masjid Assyakur Desa Jone Paser</div></div>`
+            html: `<div class="padded-slide-inner" style="justify-content:center; align-items:center;"><div class="scrollable-content info-text-content" style="padding-top:1vh; text-align: left; white-space: pre-wrap;">Masjid Assyakur Desa Jone Paser</div></div>`
         });
         return;
     }
@@ -499,8 +498,8 @@ function tambahkanItemTeksDinamis(teksMurni) {
         tipe: 'TEKS_PENGUMUMAN',
         durasi: 15000,
         html: `
-            <div class="padded-slide-inner" style="justify-content: center; align-items: flex-start; padding-left: 5vw; padding-right: 5vw;">
-                <div class="scrollable-content info-text-content" style="padding-top:2vh; text-align: left; white-space: pre-wrap; width: 100%;">${teksTampil}</div>
+            <div class="padded-slide-inner" style="justify-content: center; align-items: flex-start; padding-left: 3vw; padding-right: 3vw;">
+                <div class="scrollable-content info-text-content" style="padding-top:1vh; text-align: left; white-space: pre-wrap; width: 100%;">${teksTampil}</div>
             </div>
         `
     });
