@@ -28,7 +28,7 @@ function pancingIzinAudioBrowser() {
 }
 
 // Fungsi putar berantai: Shalawat (4:50) -> Beep Pendek -> Beep Panjang
-function putarRangkaianAdzan('https://raw.githubusercontent.com/verypriasetia/masjid-assyakur/main/audio/shalawat.mp3');
+function putarRangkaianAdzan('shalawat.mp3');
     const audioShalawat = new Audio(fileShalawat);
     
     audioShalawat.play().then(() => {
