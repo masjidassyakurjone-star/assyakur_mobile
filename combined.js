@@ -20,67 +20,6 @@ function ambilJadwalHariIni(dateObj) {
 let isAlarmAdzanPlay = false;
 let isAlarmIqamahPlay = false;
 
-let isAlarmAdzanPlay = false;
-let isAlarmIqamahPlay = false;
-
-/* ============================================================
-   SISTEM TARHIM OTOMATIS
-   Diputar 5 menit 30 detik sebelum semua waktu sholat
-============================================================ */
-
-const TARHIM_FILE = "Shalawat Tarhim.mp3";
-const TARHIM_OFFSET = 330; // 5 menit 30 detik
-
-let audioTarhim = null;
-
-let isTarhimPlay = false;
-let lastTarhimKey = "";
-
-function playTarhim() {
-
-    if (isTarhimPlay) return;
-
-    audioTarhim = new Audio(TARHIM_FILE);
-
-    audioTarhim.loop = true;
-    audioTarhim.volume = 1.0;
-
-    audioTarhim.play()
-        .then(() => {
-
-            isTarhimPlay = true;
-
-            console.log("Tarhim diputar...");
-
-        })
-        .catch(err => {
-
-            console.error("Gagal memutar Tarhim :", err);
-
-        });
-
-}
-
-function stopTarhim() {
-
-    if (!audioTarhim) return;
-
-    audioTarhim.pause();
-
-    audioTarhim.currentTime = 0;
-
-    isTarhimPlay = false;
-
-    console.log("Tarhim dihentikan.");
-
-}
-
-function resetTarhim() {
-
-    lastTarhimKey = "";
-
-}
-
 function pancingIzinAudioBrowser() {
     console.log("Izin audio berhasil dipancing melalui interaksi pengguna.");
     const dummyAudio = new Audio('BEEP PENDEK.mp3');
@@ -102,28 +41,13 @@ function putarAudioMp3(fileUtama, fileSambungan = null) {
 }
 
 function triggerAlarm(tipe) {
-
     if (tipe === 'adzan') {
-
-        // Pastikan Tarhim berhenti
-        stopTarhim();
-
-        console.log("Memicu alarm adzan...");
-
-        putarAudioMp3(
-            'BEEP PENDEK.mp3',
-            'BEEP PANJANG.mp3'
-        );
-
-    }
-    else if (tipe === 'iqamah') {
-
-        console.log("Memicu alarm iqamah...");
-
+        console.log("Memicu jalannya alarm 7 detik sebelum Adzan...");
+        putarAudioMp3('BEEP PENDEK.mp3', 'BEEP PANJANG.mp3');
+    } else if (tipe === 'iqamah') {
+        console.log("Memicu jalannya alarm 7 detik sebelum Iqamah...");
         putarAudioMp3('BEEP PENDEK.mp3');
-
     }
-
 }
 
 /* ==========================================================================
@@ -241,65 +165,7 @@ setInterval(() => {
 
     let sisaDetik = sholatBerikutnya.targetDetik - sekarangDetik;
 
-   /* ============================================================
-   CEK TARHIM
-============================================================ */
-
-const waktuMulaiTarhim = sholatBerikutnya.targetDetik - TARHIM_OFFSET;
-
-/*
-Membuat key unik agar Tarhim hanya dimainkan
-sekali untuk setiap waktu sholat.
-Contoh:
-2026-08-01_SUBUH
-2026-08-01_DZUHUR
-*/
-const tanggalKey =
-    sekarang.getFullYear() + "-" +
-    String(sekarang.getMonth() + 1).padStart(2, "0") + "-" +
-    String(sekarang.getDate()).padStart(2, "0");
-
-const keyTarhim =
-    tanggalKey + "_" + sholatBerikutnya.nama;
-
-
-/*
-Mulai Tarhim ketika sudah masuk
-5 menit 30 detik sebelum adzan
-*/
-
-if (
-    !sholatBerikutnya.isBesok &&
-    sekarangDetik >= waktuMulaiTarhim &&
-    sekarangDetik < sholatBerikutnya.targetDetik
-) {
-
-    if (!isTarhimPlay && lastTarhimKey !== keyTarhim) {
-
-        lastTarhimKey = keyTarhim;
-
-        playTarhim();
-
-    }
-
-}
-
-
-/*
-Saat sudah masuk waktu adzan,
-Tarhim langsung dihentikan.
-*/
-
-if (
-    isTarhimPlay &&
-    sekarangDetik >= sholatBerikutnya.targetDetik
-) {
-
-    stopTarhim();
-
-} 
-   
-   if (elLabel) {
+    if (elLabel) {
         elLabel.innerText = `WAKTU SHOLAT ${sholatBerikutnya.isBesok ? 'SUBUH (BESOK)' : sholatBerikutnya.nama}`;
     }
     if (elSholatJam) {
@@ -315,13 +181,8 @@ if (
     if (sisaDetik === 7 && !sholatBerikutnya.isBesok && !isAlarmAdzanPlay) {
         isAlarmAdzanPlay = true;
         triggerAlarm('adzan');
-        setTimeout(() => {
-
-    isAlarmAdzanPlay = false;
-
-    resetTarhim();
-
-},10000);
+        setTimeout(() => { isAlarmAdzanPlay = false; }, 10000);
+    }
 
     if (isModeSholatBerlangsung) return; 
 
@@ -409,8 +270,7 @@ function tampilkanInterupsiIqamahPapan(namaSholat, stringWaktu) {
 function aktifkanModeStandbySholat() {
     if (isModeSholatBerlangsung) return;
 
-        stopTarhim();
-isModeSholatBerlangsung = true;
+    isModeSholatBerlangsung = true;
     isModeMenungguIqamah = false;
 
     const slideA = document.getElementById('slide-A');
