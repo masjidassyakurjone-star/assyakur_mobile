@@ -19,6 +19,7 @@ function ambilJadwalHariIni(dateObj) {
 
 let isAlarmAdzanPlay = false;
 let isAlarmIqamahPlay = false;
+let waktuTarhimTerakhir = null;
 
 function pancingIzinAudioBrowser() {
     console.log("Izin audio berhasil dipancing melalui interaksi pengguna.");
