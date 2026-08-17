@@ -172,17 +172,26 @@ setInterval(() => {
         elSholatJam.innerText = sholatBerikutnya.waktuStr;
     }
     if (elCounterTime) {
-        let jamSisa = String(Math.floor(sisaDetik / 3600)).padStart(2, '0');
-        let menitSisa = String(Math.floor((sisaDetik % 3600) / 60)).padStart(2, '0');
-        let detikSisa = String(sisaDetik % 60).padStart(2, '0');
-        elCounterTime.innerText = `-${jamSisa}:${menitSisa}:${detikSisa}`;
-    }
+    let jamSisa = String(Math.floor(sisaDetik / 3600)).padStart(2, '0');
+    let menitSisa = String(Math.floor((sisaDetik % 3600) / 60)).padStart(2, '0');
+    let detikSisa = String(sisaDetik % 60).padStart(2, '0');
+    elCounterTime.innerText = `-${jamSisa}:${menitSisa}:${detikSisa}`;
+}
 
-    if (sisaDetik === 7 && !sholatBerikutnya.isBesok && !isAlarmAdzanPlay) {
-        isAlarmAdzanPlay = true;
-        triggerAlarm('adzan');
-        setTimeout(() => { isAlarmAdzanPlay = false; }, 10000);
+// SHALAWAT TARHIM: tepat 5 menit 10 detik (310 detik) sebelum adzan berikutnya
+if (sisaDetik === 310) {
+    const kunciTarhim = `${sholatBerikutnya.isBesok ? 'BESOK' : sekarang.toLocaleDateString('id-ID')}-${sholatBerikutnya.nama}-${sholatBerikutnya.waktuStr}`;
+    if (waktuTarhimTerakhir !== kunciTarhim) {
+        waktuTarhimTerakhir = kunciTarhim;
+        putarAudioMp3('Shalawat Tarhim.mp3');
     }
+}
+
+if (sisaDetik === 7 && !sholatBerikutnya.isBesok && !isAlarmAdzanPlay) {
+    isAlarmAdzanPlay = true;
+    triggerAlarm('adzan');
+    setTimeout(() => { isAlarmAdzanPlay = false; }, 10000);
+}
 
     if (isModeSholatBerlangsung) return; 
 
