@@ -10,7 +10,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- KONTAINER UTAMA SIGNAGE PORTRAIT MOBILE -->
+
+    <!-- OVERLAY PERINGATAN ROTASI LAYAR (Hanya Muncul Jika Landscape) -->
+    <div id="screen-rotate-warning">
+        <div class="warning-rotate-content">
+            <div class="rotate-icon">🔄</div>
+            <h2>Mohon Putar HP Anda</h2>
+            <p>Aplikasi ini didesain optimal untuk tampilan mode **PORTRAIT**.</p>
+        </div>
+    </div>
+
+    <!-- KONTAINER UTAMA SIGNAGE PORTRAIT MOBILE -->
     <div class="signage-container-portrait">
         
         <!-- HEADER -->
@@ -87,7 +97,15 @@
 
     <script>
         let isJedaManual = false;
-function toggleJedaOtomatis() {
+
+        // KUNCI ORIENTASI PORTRAIT PADA BROWSER SMARTPHONE YANG MENDUKUNG
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait').catch(function(error) {
+                console.log("Kunci orientasi otomatis ditolak browser sistem (memerlukan mode PWA/Fullscreen):", error);
+            });
+        }
+
+        function toggleJedaOtomatis() {
             const btn = document.getElementById('btn-pause-play');
             if (isModeSholatBerlangsung || isModeMenungguIqamah) return;
 
