@@ -16,11 +16,50 @@ body {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    padding: 3cqw;
-    container-type: size; 
+    padding: 3vw; 
 }
 
-.signage-container-portrait { display: none !important; }
+/* OVERLAY DETEKSI AMAN REKOMENDASI ORIENTASI */
+#screen-rotate-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #071e14;
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 5vw;
+}
+
+.warning-rotate-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vh;
+}
+
+.rotate-icon {
+    font-size: 8vh;
+    animation: putarEfek 2s infinite ease-in-out;
+}
+
+@keyframes putarEfek {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(90deg); }
+    100% { transform: rotate(0deg); }
+}
+
+#screen-rotate-warning h2 { color: #f0d17b; font-size: 3.2vh; font-weight: 800; }
+#screen-rotate-warning p { color: #ffffff; font-size: 2vh; line-height: 1.4; }
+
+/* AKTIFKAN OVERLAY JIKA PENGGUNA MEMUTAR KE LANDSCAPE */
+@media (orientation: landscape) {
+    #screen-rotate-warning { display: flex !important; }
+    .signage-container-portrait { display: none !important; }
 }
 
 .signage-container-portrait {
@@ -28,45 +67,45 @@ body {
     flex-direction: column;
     height: 100%;
     width: 100%;
-    gap: 2cqw;
+    gap: 2vw;
 }
 
-/* 1. HEADER (Tinggi 10.5cqh) */
+/* 1. HEADER (Tinggi 10.5vh) */
 .main-header-portrait {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    height: 10.5cqh;
+    height: 10.5vh;
     flex-shrink: 0;
-    padding: 0.5cqh 2cqw;
+    padding: 0.5vh 2vw;
     background: rgba(7, 30, 20, 0.65);
-    border-radius: 1cqh;
-    border: 0.15cqh solid rgba(216, 179, 90, 0.25);
+    border-radius: 1vh;
+    border: 0.15vh solid rgba(216, 179, 90, 0.25);
 }
 
 .logo-img-portrait {
-    height: 5.5cqh; 
+    height: 5.5vh; 
     width: auto;
     object-fit: contain;
     flex-shrink: 0;
-    margin-bottom: 0.2cqh;
+    margin-bottom: 0.2vh;
 }
 
 .title-container-portrait h1 {
-    font-size: 2.2cqh; 
+    font-size: 2.2vh; 
     color: #f0d17b; 
     font-weight: 800;
     line-height: 1.1;
 }
 
 .title-container-portrait .address-inline {
-    font-size: 1cqh; 
+    font-size: 1vh; 
     color: #ffffff; 
     font-weight: 600;
     line-height: 1.2;
-    margin-top: 0.2cqh;
+    margin-top: 0.2vh;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -76,17 +115,17 @@ body {
 /* 2. AREA WIDGET WAKTU & COUNTDOWN HP */
 .time-widget-row {
     display: flex;
-    gap: 2cqw;
-    height: 12.5cqh; 
+    gap: 2vw;
+    height: 12.5vh; 
     width: 100%;
     flex-shrink: 0;
 }
 
 .card-portrait {
     background: rgba(7, 30, 20, 0.78); 
-    border: 0.22cqh solid #d8b35a; 
-    border-radius: 1cqh;
-    padding: 0.6cqh 1cqh;
+    border: 0.22vh solid #d8b35a; 
+    border-radius: 1vh;
+    padding: 0.6vh 1vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -96,51 +135,51 @@ body {
     width: 50%;
 }
 
-.card-clock-portrait { gap: 0.2cqh; }
+.card-clock-portrait { gap: 0.2vh; }
 .card-clock-portrait .clock-display {
-    font-size: 3.6cqh; 
+    font-size: 3.6vh; 
     font-weight: 800;
     color: #3cf58d; 
-    text-shadow: 0 0 1cqh rgba(60, 245, 141, 0.4);
+    text-shadow: 0 0 1vh rgba(60, 245, 141, 0.4);
     line-height: 1;
     white-space: nowrap;
 }
-.card-clock-portrait .date-display { font-size: 1.5cqh; color: #ffffff; font-weight: 600; line-height: 1.1; white-space: nowrap; }
-.card-clock-portrait .hijri-display { font-size: 1.5cqh; color: #f0d17b; font-weight: 700; line-height: 1.1; white-space: nowrap; }
+.card-clock-portrait .date-display { font-size: 1.5vh; color: #ffffff; font-weight: 600; line-height: 1.1; white-space: nowrap; }
+.card-clock-portrait .hijri-display { font-size: 1.5vh; color: #f0d17b; font-weight: 700; line-height: 1.1; white-space: nowrap; }
 
-.card-countdown-portrait { gap: 0.2cqh; }
-.card-countdown-portrait .countdown-status { font-size: 1.4cqh; font-weight: 700; color: #d8b35a; white-space: nowrap; }
-.card-countdown-portrait .countdown-sholat-time { font-size: 3.6cqh; font-weight: 800; color: #ffffff; line-height: 1; white-space: nowrap; }
+.card-countdown-portrait { gap: 0.2vh; }
+.card-countdown-portrait .countdown-status { font-size: 1.4vh; font-weight: 700; color: #d8b35a; white-space: nowrap; }
+.card-countdown-portrait .countdown-sholat-time { font-size: 3.6vh; font-weight: 800; color: #ffffff; line-height: 1; white-space: nowrap; }
 
 .countdown-box-red {
-    border: 0.18cqh solid #ff5252;
+    border: 0.18vh solid #ff5252;
     background: rgba(255, 82, 82, 0.1);
-    border-radius: 0.5cqh;
-    padding: 0.1cqh 2cqw;
+    border-radius: 0.5vh;
+    padding: 0.1vh 2vw;
     display: inline-flex;
 }
-.countdown-box-red span { font-size: 1.9cqh; font-weight: 700; color: #ff5252; white-space: nowrap; }
+.countdown-box-red span { font-size: 1.9vh; font-weight: 700; color: #ff5252; white-space: nowrap; }
 
 /* 3. PAPAN INFORMASI UTAMA MOBILE MADING */
 .main-papan-portrait {
     display: flex;
     flex-direction: column;
     background: rgba(7, 30, 20, 0.78);
-    border: 0.25cqh solid #d8b35a;
-    border-radius: 1cqh 1cqh 0 0;
-    height: 56.5cqh; 
+    border: 0.25vh solid #d8b35a;
+    border-radius: 1vh 1vh 0 0;
+    height: 56.5vh; 
     overflow: hidden;
 }
 
 .papan-header-portrait {
     background: rgba(7, 30, 20, 0.9);
     color: #f0d17b;
-    font-size: 2.2cqh;
+    font-size: 2.2vh;
     font-weight: 700;
     text-align: center;
-    padding: 1cqh 0;
-    border-bottom: 0.2cqh solid #d8b35a;
-    letter-spacing: 0.1cqh;
+    padding: 1vh 0;
+    border-bottom: 0.2vh solid #d8b35a;
+    letter-spacing: 0.1vh;
 }
 
 .papan-body-portrait { flex: 1; width: 100%; overflow: hidden; }
@@ -148,10 +187,10 @@ body {
 .papan-control-panel {
     display: flex;
     background: rgba(7, 30, 20, 0.9);
-    border: 0.25cqh solid #d8b35a;
+    border: 0.25vh solid #d8b35a;
     border-top: none;
-    border-radius: 0 0 1cqh 1cqh;
-    height: 4cqh;
+    border-radius: 0 0 1vh 1vh;
+    height: 4vh;
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -161,13 +200,13 @@ body {
     background: transparent;
     border: none;
     color: #ffffff;
-    font-size: 1.4cqh;
+    font-size: 1.4vh;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.ctrl-btn:not(:last-child) { border-right: 0.15cqh solid rgba(216, 179, 90, 0.3); }
+.ctrl-btn:not(:last-child) { border-right: 0.15vh solid rgba(216, 179, 90, 0.3); }
 .ctrl-btn.active-status { background: #ff5252; }
 
 .slide-container { position: relative; width: 100%; height: 100%; }
@@ -176,41 +215,41 @@ body {
 
 /* 4. REKENING INFAQ */
 .card-rekening-portrait {
-    height: 8cqh;
+    height: 8vh;
     width: 100%;
     flex-shrink: 0;
     background: rgba(7, 30, 20, 0.78);
-    border: 0.22cqh solid #d8b35a;
-    border-radius: 1cqh;
+    border: 0.22vh solid #d8b35a;
+    border-radius: 1vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 3cqw;
+    padding: 0 3vw;
 }
-.rekening-title { font-size: 1.6cqh; font-weight: 800; color: #f0d17b; }
-.rekening-info-block .bank-name { font-size: 1.3cqh; color: #a2bcae; font-weight: 600; }
-.rekening-info-block .acc-number { font-size: 2.3cqh; font-weight: 800; color: #3cf58d; }
+.rekening-title { font-size: 1.6vh; font-weight: 800; color: #f0d17b; }
+.rekening-info-block .bank-name { font-size: 1.3vh; color: #a2bcae; font-weight: 600; }
+.rekening-info-block .acc-number { font-size: 2.3vh; font-weight: 800; color: #3cf58d; }
 
 /* 5. FOOTER RUNNING TEXT */
 .main-footer-portrait {
     background: rgba(0, 0, 0, 0.75);
-    border: 0.2cqh solid #d8b35a;
-    border-radius: 0.8cqh;
-    height: 7.5cqh; 
+    border: 0.2vh solid #d8b35a;
+    border-radius: 0.8vh;
+    height: 7.5vh; 
     display: flex;
     align-items: center;
     width: 100%;
     flex-shrink: 0;
-    padding: 0.5cqh 2cqw;
+    padding: 0.5vh 2vw;
 }
 .running-text-wrapper { display: flex; flex-direction: column; width: 100%; height: 100%; justify-content: space-between; }
-.running-text-label { font-size: 1.2cqh; color: #f0d17b; font-weight: 800; text-transform: uppercase; border-bottom: 0.15cqh solid rgba(216, 179, 90, 0.3); width: 100%; }
-#running-text { font-size: 2.1cqh !important; color: #ffffff !important; font-weight: 600 !important; }
+.running-text-label { font-size: 1.2vh; color: #f0d17b; font-weight: 800; text-transform: uppercase; border-bottom: 0.15vh solid rgba(216, 179, 90, 0.3); width: 100%; }
+#running-text { font-size: 2.1vh !important; color: #ffffff !important; font-weight: 600 !important; }
 
 /* FIXED SLIDER KAS LAYAR HP: Mengunci lebar agar tidak melebihi frame */
-.padded-slide-inner { width: 100%; height: 100%; padding: 1.5cqh 2.5cqw; display: flex; flex-direction: column; }
+.padded-slide-inner { width: 100%; height: 100%; padding: 1.5vh 2.5vw; display: flex; flex-direction: column; }
 .slide-stretched-img { width: 100%; height: 100%; object-fit: contain; }
-.info-text-content { font-family: 'Times New Roman', Times, serif !important; font-size: 2.3cqh !important; line-height: 1.4; color: #ffffff !important; font-weight: bold; }
+.info-text-content { font-family: 'Times New Roman', Times, serif !important; font-size: 2.3vh !important; line-height: 1.4; color: #ffffff !important; font-weight: bold; }
 
 .table-responsive { 
     width: 100% !important; 
@@ -223,13 +262,13 @@ body {
     width: 100% !important; 
     table-layout: fixed !important; /* Paksa grid membagi kolom secara proporsional */
     border-collapse: collapse; 
-    font-size: 1.25cqh !important; /* Disesuaikan untuk keterbacaan HP */
+    font-size: 1.25vh !important; /* Disesuaikan untuk keterbacaan HP */
 }
 
-.table-kas th { background: rgba(7, 30, 20, 0.9); color: #f0d17b; padding: 0.6cqh 0.5cqw; border: 0.1cqh solid #d8b35a; font-weight: 700; font-size: 1.25cqh; }
+.table-kas th { background: rgba(7, 30, 20, 0.9); color: #f0d17b; padding: 0.6vh 0.5vw; border: 0.1vh solid #d8b35a; font-weight: 700; font-size: 1.25vh; }
 .table-kas td { 
-    padding: 0.6cqh 0.5cqw; 
-    border: 0.1cqh solid rgba(216, 179, 90, 0.3); 
+    padding: 0.6vh 0.5vw; 
+    border: 0.1vh solid rgba(216, 179, 90, 0.3); 
     word-break: break-word !important; /* Pecah kalimat panjang ke bawah otomatis */
     overflow-wrap: break-word !important;
 }
@@ -245,33 +284,12 @@ body {
 .text-right { text-align: right; }
 
 /* SETELAN JUMATAN MOBILE */
-.judul-jumat-besar { font-size: 2.6cqh !important; color: #f0d17b !important; font-weight: 800 !important; text-align: center !important; }
-.tanggal-jumat-besar { font-size: 1.8cqh !important; color: #ffffff !important; font-weight: 600 !important; text-align: center !important; }
-.tabel-jumat-tv { font-size: 2cqh !important; width: 90% !important; margin: 0 auto !important; border-collapse: collapse !important; }
-.tabel-jumat-tv td { padding: 1cqh 1cqw !important; }
+.judul-jumat-besar { font-size: 2.6vh !important; color: #f0d17b !important; font-weight: 800 !important; text-align: center !important; }
+.tanggal-jumat-besar { font-size: 1.8vh !important; color: #ffffff !important; font-weight: 600 !important; text-align: center !important; }
+.tabel-jumat-tv { font-size: 2vh !important; width: 90% !important; margin: 0 auto !important; border-collapse: collapse !important; }
+.tabel-jumat-tv td { padding: 1vh 1vw !important; }
 .tabel-jumat-tv td:nth-child(1) { color: #a2bcae !important; font-weight: 700 !important; width: 35% !important; }
 .tabel-jumat-tv td:nth-child(2) { color: #d8b35a !important; text-align: center !important; width: 5% !important; }
 .tabel-jumat-tv td:nth-child(3) { color: #ffffff !important; font-weight: 800 !important; }
 
-#sholat-standby-overlay { display: none; position: fixed; top: 0; left: 0; width: 100cqw; height: 100cqh; background: #000000; z-index: 9999; }
-
-/* ==========================================================================
-   ROTASI OTOMATIS LANDSCAPE -> PORTRAIT
-   Tidak ada lagi peringatan orientasi.
-   ========================================================================== */
-@media (orientation: landscape) {
-    html, body {
-        overflow: hidden;
-    }
-
-    body {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 100vh;
-        height: 100vw;
-        margin: 0;
-        transform: translate(-50%, -50%) rotate(270deg);
-        transform-origin: center center;
-    }
-}
+#sholat-standby-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 9999; }
