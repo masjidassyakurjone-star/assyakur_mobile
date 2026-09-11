@@ -6,14 +6,14 @@
    BAGIAN 1: SISTEM DATABASE JADWAL SHOLAT INTERNAL & ALARM (AUDIO MP3)
    ========================================================================== */
 function ambilJadwalHariIni(dateObj) {
+    const tahun = "2026";
     const bulan = String(dateObj.getMonth() + 1).padStart(2, '0');
     const tanggal = String(dateObj.getDate()).padStart(2, '0');
-    const keyTanggal = `${bulan}-${tanggal}`;
+    const keyTanggal = `${tahun}-${bulan}-${tanggal}`; 
 
     if (typeof DATABASE_JADWAL_TAHUNAN !== 'undefined' && DATABASE_JADWAL_TAHUNAN[keyTanggal]) {
         return DATABASE_JADWAL_TAHUNAN[keyTanggal];
     }
-
     return { imsak: "04:44", fajr: "04:54", dhuhr: "12:18", asr: "15:43", magrib: "18:21", isya: "19:35" };
 }
 
