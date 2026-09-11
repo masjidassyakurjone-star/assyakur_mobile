@@ -66,10 +66,13 @@ function hitungHijriyahOtomatis(dateObj) {
         let detikMagribHariIni = (jamMagrib * 3600) + (menitMagrib * 60);
         let detikSekarang = (dateObj.getHours() * 3600) + (dateObj.getMinutes() * 60) + dateObj.getSeconds();
         
-        if (detikSekarang >= detikMagribHariIni) {
+         if (detikSekarang >= detikMagribHariIni) {
             kustomSore.setDate(kustomSore.getDate() + 1);
         }
     }
+
+    // Koreksi kalender Hijriyah: mundur 1 hari
+    kustomSore.setDate(kustomSore.getDate() - 1);
 
     let jd = Math.floor(kustomSore.getTime() / 86400000) + 2440589;
     let l = jd - 1948440 + 10632;
