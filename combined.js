@@ -72,7 +72,7 @@ function hitungHijriyahOtomatis(dateObj) {
     }
 
     // Koreksi kalender Hijriyah: mundur 1 hari
-    kustomSore.setDate(kustomSore.getDate() - 1);
+    kustomSore.setDate(kustomSore.getDate() + 1);
 
     let jd = Math.floor(kustomSore.getTime() / 86400000) + 2440589;
     let l = jd - 1948440 + 10632;
