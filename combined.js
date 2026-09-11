@@ -1,15 +1,14 @@
 /* ==========================================================================
-   COMBINED.JS - ENGINE SIGNAGE MASJID ASSYAKUR V2.8 (FIXED NAVIGASI SINKRON)
+   COMBINED.JS - ENGINE SIGNAGE MASJID ASSYAKUR V2.9 (270 DEG ROTATED & MM-DD)
    ========================================================================== */
 
 /* ==========================================================================
    BAGIAN 1: SISTEM DATABASE JADWAL SHOLAT INTERNAL & ALARM (AUDIO MP3)
    ========================================================================== */
 function ambilJadwalHariIni(dateObj) {
-    const tahun = "2026";
     const bulan = String(dateObj.getMonth() + 1).padStart(2, '0');
     const tanggal = String(dateObj.getDate()).padStart(2, '0');
-    const keyTanggal = `${tahun}-${bulan}-${tanggal}`; 
+    const keyTanggal = `${bulan}-${tanggal}`; // Format MM-DD tanpa tahun
 
     if (typeof DATABASE_JADWAL_TAHUNAN !== 'undefined' && DATABASE_JADWAL_TAHUNAN[keyTanggal]) {
         return DATABASE_JADWAL_TAHUNAN[keyTanggal];
@@ -19,7 +18,6 @@ function ambilJadwalHariIni(dateObj) {
 
 let isAlarmAdzanPlay = false;
 let isAlarmIqamahPlay = false;
-let waktuTarhimTerakhir = null;
 
 function pancingIzinAudioBrowser() {
     console.log("Izin audio berhasil dipancing melalui interaksi pengguna.");
@@ -108,11 +106,35 @@ let dataMasjidJeda = { SUBUH: 12, DZUHUR: 10, ASHAR: 10, MAGHRIB: 7, ISYA: 10 };
 let isModeSholatBerlangsung = false;
 let isModeMenungguIqamah = false;
 
-let DAFTAR_GAMBAR_LOKAL = [];
+/* MODE DISPLAY JUMAT */
+let isModeInfoJumat = false;
+let modeInfoJumatTimeout = null;
+let modeStandbyJumatTimeout = null;
+const DURASI_STANDBY_JUMAT = 60 * 1000;
 
+const DURASI_LAYER_MASUK_JUMAT = 3 * 1000;
+const DURASI_TEKS_MASUK_JUMAT = 3 * 1000;
+const DURASI_TAHAN_JUMAT = 30 * 1000;
+const DURASI_FADE_OUT_JUMAT = 3 * 1000;
+
+const JEDA_SEBELUM_KAS = 5 * 1000;
+const DURASI_KAS_FADE_IN = 3 * 1000;
+const DURASI_KAS_JUDUL = 10 * 1000;
+const DURASI_KAS_FADE_OUT = 3 * 1000;
+const DURASI_TABEL_KAS_FADE_IN = 3 * 1000;
+const DURASI_TABEL_KAS_TAMPIL = 30 * 1000;
+const DURASI_TABEL_KAS_FADE_OUT = 3 * 1000;
+let modeKasTimeout = null;
+let modeKasTahap = null;
+
+const DURASI_INFO_JUMAT =
+    DURASI_LAYER_MASUK_JUMAT +
+    DURASI_TEKS_MASUK_JUMAT +
+    DURASI_TAHAN_JUMAT;
+
+let DAFTAR_GAMBAR_LOKAL = [];
 let globalImageIndex = 0;      
 let globalTextIndex = 0;       
-let menggunakanSlideA = true;
 
 setInterval(() => {
     const sekarang = new Date();
@@ -167,32 +189,23 @@ setInterval(() => {
     let sisaDetik = sholatBerikutnya.targetDetik - sekarangDetik;
 
     if (elLabel) {
-        elLabel.innerText = `WAKTU SHOLAT ${sholatBerikutnya.isBesok ? 'SUBUH (BESOK)' : sholatBerikutnya.nama}`;
+        elLabel.innerText = sholatBerikutnya.isBesok ? 'SUBUH' : sholatBerikutnya.nama;
     }
     if (elSholatJam) {
         elSholatJam.innerText = sholatBerikutnya.waktuStr;
     }
     if (elCounterTime) {
-    let jamSisa = String(Math.floor(sisaDetik / 3600)).padStart(2, '0');
-    let menitSisa = String(Math.floor((sisaDetik % 3600) / 60)).padStart(2, '0');
-    let detikSisa = String(sisaDetik % 60).padStart(2, '0');
-    elCounterTime.innerText = `-${jamSisa}:${menitSisa}:${detikSisa}`;
-}
-
-// SHALAWAT TARHIM: tepat 5 menit 10 detik (310 detik) sebelum adzan berikutnya
-if (sisaDetik === 310) {
-    const kunciTarhim = `${sholatBerikutnya.isBesok ? 'BESOK' : sekarang.toLocaleDateString('id-ID')}-${sholatBerikutnya.nama}-${sholatBerikutnya.waktuStr}`;
-    if (waktuTarhimTerakhir !== kunciTarhim) {
-        waktuTarhimTerakhir = kunciTarhim;
-        putarAudioMp3('Shalawat Tarhim.mp3');
+        let jamSisa = String(Math.floor(sisaDetik / 3600));
+        let menitSisa = String(Math.floor((sisaDetik % 3600) / 60)).padStart(2, '0');
+        let detikSisa = String(sisaDetik % 60).padStart(2, '0');
+        elCounterTime.innerText = `${jamSisa}:${menitSisa}:${detikSisa}`;
     }
-}
 
-if (sisaDetik === 7 && !sholatBerikutnya.isBesok && !isAlarmAdzanPlay) {
-    isAlarmAdzanPlay = true;
-    triggerAlarm('adzan');
-    setTimeout(() => { isAlarmAdzanPlay = false; }, 10000);
-}
+    if (sisaDetik === 7 && !sholatBerikutnya.isBesok && !isAlarmAdzanPlay) {
+        isAlarmAdzanPlay = true;
+        triggerAlarm('adzan');
+        setTimeout(() => { isAlarmAdzanPlay = false; }, 10000);
+    }
 
     if (isModeSholatBerlangsung) return; 
 
@@ -246,34 +259,29 @@ function tampilkanInterupsiIqamahPapan(namaSholat, stringWaktu) {
     const slideB = document.getElementById('slide-B');
     if (!slideA || !slideB) return;
 
-    // KOREKSI IQAMAH MOBILE: Angka countdown diturunkan ke 9vh, teks arab dan terjemahan disusun rapi proporsional HP
     const htmlIqamahMenyolok = `
-        <div class="padded-slide-inner" style="justify-content: center; align-items: center; background: #03150d; height: 100%; padding: 1.5vh 3vw;">
-            <div style="font-size: 2vh; color: #e5c158; font-weight: 700; letter-spacing: 0.1vh; text-transform: uppercase; margin-bottom: 0.2vh;">MENUNGGU IQAMAH</div>
-            <div style="font-size: 3.5vh; color: #ffffff; font-weight: 800; margin-bottom: 1vh; text-transform: uppercase; letter-spacing: 0.05vh; line-height: 1;">${namaSholat}</div>
-            
-            <div style="font-size: 9vh; font-weight: 900; color: #ff5252; background: rgba(255, 0, 0, 0.15); border: 0.3vh solid #ff5252; padding: 0.2vh 6vw; border-radius: 1.5vh; line-height: 1.1; font-variant-numeric: tabular-nums; margin-bottom: 1.5vh; box-shadow: 0 0 2vh rgba(255, 82, 82, 0.3);">
-                ${stringWaktu}
-            </div>
-            
-            <div style="width: 100%; background: rgba(0,0,0,0.4); padding: 1.5vh 2.5vw; border-radius: 1vh; border: 0.18vh solid rgba(229,193,88,0.25); text-align: center;">
-                <div style="font-family: 'Amiri', serif; font-size: 2.3vh; color: #e5c158; direction: rtl; line-height: 1.4; margin-bottom: 1vh; font-weight: 700; letter-spacing: 0;">
-                    لاَ يُرَدُّ الدُّعَاءُ بَيْنَ الأَذَانِ وَالإِقَامَةِ
-                </div>
-                <div style="font-family: 'Montserrat', sans-serif; font-size: 1.5vh; color: #ffffff; font-weight: 600; line-height: 1.3; font-style: italic;">
-                    "Doa antara adzan dan iqamah tidak akan ditolak."
+        <div class="iqamah-overlay">
+            <img src="bg-masjid.jpg" class="iqamah-bg" alt="">
+            <div class="iqamah-shade"></div>
+            <div class="iqamah-content">
+                <div class="iqamah-label">MENUNGGU IQAMAH</div>
+                <div class="iqamah-prayer">${namaSholat}</div>
+                <div class="iqamah-counter">${stringWaktu}</div>
+                <div class="iqamah-hadith">
+                    <div class="iqamah-arabic">لاَ يُرَدُّ الدُّعَاءُ بَيْنَ الأَذَانِ وَالإِقَامَةِ</div>
+                    <div class="iqamah-translation">"Doa antara adzan dan iqamah tidak akan ditolak."</div>
                 </div>
             </div>
         </div>
     `;
 
-    if (slideA.classList.contains('active')) {
-        slideA.innerHTML = htmlIqamahMenyolok;
-    } else if (slideB.classList.contains('active')) {
-        slideB.innerHTML = htmlIqamahMenyolok;
-    } else {
-        slideA.innerHTML = htmlIqamahMenyolok;
-        slideA.classList.add('active');
+    const target = slideA.classList.contains('active') ? slideA :
+                   slideB.classList.contains('active') ? slideB : slideA;
+    target.innerHTML = htmlIqamahMenyolok;
+    if (!target.classList.contains('active')) {
+        slideA.classList.remove('active');
+        slideB.classList.remove('active');
+        target.classList.add('active');
     }
 }
 
@@ -290,17 +298,293 @@ function aktifkanModeStandbySholat() {
     if (slideTimeout) clearTimeout(slideTimeout);
     if (scrollInterval) clearInterval(scrollInterval);
 
-    const htmlStandbyGambar = `<img src="waktu_sholat.jpg" class="slide-stretched-img" style="width:100%; height:100%; object-fit:contain; display:block;" onerror="this.onerror=null; this.src='logo.png';">`;
-    
-    slideA.innerHTML = htmlStandbyGambar;
-    slideB.innerHTML = ""; 
+    const htmlStandby = `
+        <div class="sholat-standby">
+            <div class="sholat-standby-text">
+                Selamat menunaikan ibadah Sholat berjamaah,<br>
+                luruskan dan rapatkan shaf untuk kesempurnaan sholat,<br>
+                matikan/silentkan hp dan hal mengganggu lainnya.
+            </div>
+        </div>
+    `;
+
+    slideA.innerHTML = htmlStandby;
+    slideB.innerHTML = "";
     slideB.classList.remove('active');
     slideA.classList.add('active');
 
     setTimeout(() => {
         isModeSholatBerlangsung = false;
-        bangunStrukturSlideAntrian(); 
-    }, 600000); 
+        bangunStrukturSlideAntrian();
+    }, 600000);
+}
+
+/* ========================================================================
+   MODE INFO SHOLAT JUMAT & KAS
+   ======================================================================== */
+
+function escapeHtmlJumat(nilai) {
+    return String(nilai ?? '-').replace(/[&<>'"]/g, karakter => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[karakter]));
+}
+
+function ambilDataInfoJumat() {
+    const dataJumat = cacheDataSheetGlobal?.[0]?.values || [];
+    return {
+        tanggal: (dataJumat[0] && dataJumat[0][1]) ? dataJumat[0][1] : '-',
+        khatib:  (dataJumat[1] && dataJumat[1][1]) ? dataJumat[1][1] : '-',
+        imam:    (dataJumat[2] && dataJumat[2][1]) ? dataJumat[2][1] : '-',
+        muadzin: (dataJumat[3] && dataJumat[3][1]) ? dataJumat[3][1] : '-'
+    };
+}
+
+function renderModeInfoJumat() {
+    const overlay = document.getElementById('jumat-mode-overlay');
+    const content = document.getElementById('jumat-mode-content');
+    if (!overlay || !content) return;
+
+    const data = ambilDataInfoJumat();
+
+    content.innerHTML = `
+        <div class="jumat-title">Informasi Sholat Jumat</div>
+        <div class="jumat-date">${escapeHtmlJumat(data.tanggal)}</div>
+        <table class="jumat-table">
+            <tbody>
+                <tr class="jumat-row-1">
+                    <td>Khatib</td><td>:</td><td>${escapeHtmlJumat(data.khatib)}</td>
+                </tr>
+                <tr class="jumat-row-2">
+                    <td>Imam</td><td>:</td><td>${escapeHtmlJumat(data.imam)}</td>
+                </tr>
+                <tr class="jumat-row-3">
+                    <td>Muadzin</td><td>:</td><td>${escapeHtmlJumat(data.muadzin)}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+}
+
+function tampilkanModeInfoJumat() {
+    const overlay = document.getElementById('jumat-mode-overlay');
+    if (!overlay) return;
+
+    if (modeStandbyJumatTimeout) {
+        clearTimeout(modeStandbyJumatTimeout);
+        modeStandbyJumatTimeout = null;
+    }
+
+    if (isModeSholatBerlangsung || isModeMenungguIqamah) {
+        jadwalkanModeInfoJumat(15000);
+        return;
+    }
+
+    isModeInfoJumat = true;
+    renderModeInfoJumat();
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    if (modeInfoJumatTimeout) clearTimeout(modeInfoJumatTimeout);
+    modeInfoJumatTimeout = setTimeout(() => {
+        sembunyikanModeInfoJumat();
+    }, DURASI_INFO_JUMAT);
+}
+
+function sembunyikanModeInfoJumat() {
+    const overlay = document.getElementById('jumat-mode-overlay');
+    if (!overlay) return;
+
+    if (modeInfoJumatTimeout) {
+        clearTimeout(modeInfoJumatTimeout);
+        modeInfoJumatTimeout = null;
+    }
+
+    isModeInfoJumat = false;
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    if (modeStandbyJumatTimeout) clearTimeout(modeStandbyJumatTimeout);
+    modeStandbyJumatTimeout = setTimeout(() => {
+        modeStandbyJumatTimeout = null;
+        mulaiSiklusKasSetelahJumat();
+    }, DURASI_FADE_OUT_JUMAT);
+}
+
+function escapeHtmlKas(nilai) {
+    return String(nilai ?? '-').replace(/[&<>"']/g, karakter => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[karakter]));
+}
+
+function ambilDataKasMode() {
+    const rows = cacheDataSheetGlobal?.[1]?.values || [];
+    let saldoAwal = 'Rp 0', saldoAkhir = 'Rp 0';
+    let masuk = 0, keluar = 0;
+    for (let i=1; i<rows.length; i++) {
+        const r=rows[i] || [];
+        const ket=String(r[1] ?? '').toUpperCase().trim();
+        if (ket.includes('SALDO AWAL')) saldoAwal = formatMataUangAman(r[4], false);
+        masuk += r[2] ? bersihkanAngka(r[2]) : 0;
+        keluar += r[3] ? bersihkanAngka(r[3]) : 0;
+        if (r[4] && String(r[4]).trim() !== '' && String(r[4]).trim() !== '0') saldoAkhir = formatMataUangAman(r[4], false);
+    }
+    return { rows, saldoAwal, saldoAkhir, masuk: 'Rp ' + masuk.toLocaleString('id-ID'), keluar: 'Rp ' + keluar.toLocaleString('id-ID') };
+}
+
+function renderKasJudul() {
+    const c = document.getElementById('kas-mode-content');
+    if (!c) return;
+
+    const d = ambilDataKasMode();
+
+    c.innerHTML = `
+        <div class="kas-stage-finance">
+            <div class="kas-balance-screen">
+                <div class="kas-balance-header">
+                    <span>PAPAN INFORMASI MASJID</span>
+                </div>
+                <div class="kas-balance-box kas-balance-opening">
+                    <div class="kas-balance-caption">Saldo Jumat Lalu</div>
+                    <div class="kas-balance-value">${escapeHtmlKas(d.saldoAwal)}</div>
+                </div>
+                <div class="kas-balance-flow">
+                    <div class="kas-balance-box kas-balance-in">
+                        <div class="kas-balance-caption">Masuk</div>
+                        <div class="kas-balance-value">${escapeHtmlKas(d.masuk)}</div>
+                    </div>
+                    <div class="kas-balance-box kas-balance-out">
+                        <div class="kas-balance-caption">Keluar</div>
+                        <div class="kas-balance-value">${escapeHtmlKas(d.keluar)}</div>
+                    </div>
+                </div>
+                <div class="kas-balance-box kas-balance-final">
+                    <div class="kas-balance-caption">SALDO SEKARANG</div>
+                    <div class="kas-balance-value">${escapeHtmlKas(d.saldoAkhir)}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderTabelKasMode() {
+    const c=document.getElementById('kas-mode-content'); if(!c) return;
+    const d=ambilDataKasMode();
+    let body='';
+    for(let i=1;i<d.rows.length;i++) {
+        const r=d.rows[i]||[];
+        body += `<tr><td>${escapeHtmlKas(r[0]||'-')}</td><td>${escapeHtmlKas(r[1]||'-')}</td><td>${escapeHtmlKas(formatMataUangAman(r[2],true))}</td><td>${escapeHtmlKas(formatMataUangAman(r[3],true))}</td><td>${escapeHtmlKas(formatMataUangAman(r[4],true))}</td></tr>`;
+    }
+    c.innerHTML=`<div class="kas-stage-table"><div class="kas-table-wrap">
+        <div class="kas-table-title">LAPORAN KAS MASJID</div>
+        <div class="kas-table-scroll"><table class="kas-table"><thead><tr><th>TGL</th><th>URAIAN TRANSAKSI</th><th>MASUK</th><th>KELUAR</th><th>SALDO</th></tr></thead><tbody>${body}</tbody></table></div>
+    </div></div>`;
+}
+
+function sembunyikanModeKas(callback) {
+    const o=document.getElementById('kas-mode-overlay'); if(!o){ if(callback) callback(); return; }
+    o.classList.remove('active'); o.setAttribute('aria-hidden','true');
+    setTimeout(()=>{ if(callback) callback(); }, DURASI_KAS_FADE_OUT);
+}
+
+function mulaiModeKas() {
+    const o=document.getElementById('kas-mode-overlay'); if(!o) return;
+    if(modeKasTimeout) clearTimeout(modeKasTimeout);
+    modeKasTahap='keuangan'; renderKasJudul();
+    o.classList.remove('kas-table-stage'); o.classList.add('active'); o.setAttribute('aria-hidden','false');
+    modeKasTimeout=setTimeout(()=>{
+        sembunyikanModeKas(()=>{
+            setTimeout(()=>mulaiModeTabelKas(), 0);
+        });
+    }, DURASI_KAS_FADE_IN + DURASI_KAS_JUDUL);
+}
+
+function mulaiModeTabelKas() {
+    const o=document.getElementById('kas-mode-overlay'); if(!o) return;
+    if(modeKasTimeout) clearTimeout(modeKasTimeout);
+    modeKasTahap='tabel'; renderTabelKasMode();
+    o.classList.remove('active');
+    void o.offsetWidth;
+    o.classList.add('active'); o.setAttribute('aria-hidden','false');
+
+    setTimeout(() => {
+        aktifkanAutoScrollTabelKas(DURASI_TABEL_KAS_TAMPIL);
+    }, DURASI_TABEL_KAS_FADE_IN);
+
+    modeKasTimeout=setTimeout(()=>{
+        hentikanAutoScrollTabelKas();
+        sembunyikanModeKas(()=>{
+            modeKasTimeout=setTimeout(()=>jadwalkanModeInfoJumat(DURASI_STANDBY_JUMAT), DURASI_TABEL_KAS_FADE_OUT);
+        });
+    }, DURASI_TABEL_KAS_FADE_IN + DURASI_TABEL_KAS_TAMPIL);
+}
+
+let kasTableScrollAnimation = null;
+let kasTableScrollTimer = null;
+
+function hentikanAutoScrollTabelKas() {
+    if (kasTableScrollTimer) {
+        clearTimeout(kasTableScrollTimer);
+        kasTableScrollTimer = null;
+    }
+    if (kasTableScrollAnimation) {
+        cancelAnimationFrame(kasTableScrollAnimation);
+        kasTableScrollAnimation = null;
+    }
+}
+
+function aktifkanAutoScrollTabelKas(durasiTampil) {
+    hentikanAutoScrollTabelKas();
+
+    kasTableScrollTimer = setTimeout(() => {
+        const area = document.querySelector('#kas-mode-overlay.active .kas-table-scroll');
+        if (!area) return;
+
+        const jarak = area.scrollHeight - area.clientHeight;
+        if (jarak <= 2) return;
+
+        area.scrollTop = 0;
+
+        const jedaAwal = 2000;
+        const jedaAkhir = 2000;
+        const durasiScroll = Math.max(1000, durasiTampil - jedaAwal - jedaAkhir);
+
+        kasTableScrollTimer = setTimeout(() => {
+            const mulai = performance.now();
+
+            function langkahScroll(sekarang) {
+                const progres = Math.min((sekarang - mulai) / durasiScroll, 1);
+                area.scrollTop = jarak * progres;
+
+                if (progres < 1 && document.body.contains(area)) {
+                    kasTableScrollAnimation = requestAnimationFrame(langkahScroll);
+                } else {
+                    kasTableScrollAnimation = null;
+                }
+            }
+
+            kasTableScrollAnimation = requestAnimationFrame(langkahScroll);
+        }, jedaAwal);
+    }, 50);
+}
+
+function mulaiSiklusKasSetelahJumat() {
+    if(modeKasTimeout) clearTimeout(modeKasTimeout);
+    modeKasTimeout=setTimeout(()=>mulaiModeKas(), JEDA_SEBELUM_KAS);
+}
+
+function jadwalkanModeInfoJumat(durasi = DURASI_STANDBY_JUMAT) {
+    if (modeStandbyJumatTimeout) clearTimeout(modeStandbyJumatTimeout);
+
+    modeStandbyJumatTimeout = setTimeout(() => {
+        modeStandbyJumatTimeout = null;
+        tampilkanModeInfoJumat();
+    }, durasi);
+}
+
+function mulaiSiklusModeInfoJumat() {
+    if (modeStandbyJumatTimeout) clearTimeout(modeStandbyJumatTimeout);
+    if (modeInfoJumatTimeout) clearTimeout(modeInfoJumatTimeout);
+    jadwalkanModeInfoJumat(DURASI_STANDBY_JUMAT);
 }
 
 /* ==========================================================================
@@ -309,7 +593,8 @@ function aktifkanModeStandbySholat() {
 window.addEventListener('DOMContentLoaded', () => {
     tampilkanDataDariCacheLokal();
     muatDataGoogleSheets();
-    setInterval(muatDataGoogleSheets, 5 * 60 * 1000); 
+    setInterval(muatDataGoogleSheets, 5 * 60 * 1000);
+    mulaiSiklusModeInfoJumat();
 });
 
 let cacheDataSheetGlobal = null;
@@ -325,6 +610,7 @@ async function muatDataGoogleSheets() {
         if (hasil.valueRanges) {
             localStorage.setItem('cache_display_masjid', JSON.stringify(hasil.valueRanges));
             cacheDataSheetGlobal = hasil.valueRanges;
+            if (isModeInfoJumat) renderModeInfoJumat();
             if (!isModeSholatBerlangsung && !isModeMenungguIqamah && dataSlides.length === 0) {
                 bangunStrukturSlideAntrian();
             }
@@ -339,6 +625,7 @@ function tampilkanDataDariCacheLokal() {
     const cacheData = localStorage.getItem('cache_display_masjid');
     if (cacheData) {
         cacheDataSheetGlobal = JSON.parse(cacheData);
+        if (isModeInfoJumat) renderModeInfoJumat();
         if (!isModeSholatBerlangsung && !isModeMenungguIqamah && dataSlides.length === 0) {
             bangunStrukturSlideAntrian();
         }
@@ -404,14 +691,14 @@ function bangunStrukturSlideAntrian() {
         tipe: 'TEKS_JUMAT',
         durasi: 15000,
         html: `
-            <div class="padded-slide-inner-jumat" style="width:100%; height:100%; padding:2vh 4vw; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <div class="judul-jumat-besar">SHOLAT JUMAT</div>
-                <div class="tanggal-jumat-besar">${tglJmt}</div>
-                <div style="display:flex; justify-content:center; align-items:center; width:100%; margin-top:1vh;">
+            <div class="jumat-stage">
+                <div class="jumat-content">
+                    <div class="judul-jumat-besar">PETUGAS JUMAT</div>
+                    <div class="tanggal-jumat-besar">${tglJmt}</div>
                     <table class="tabel-jumat-tv">
-                        <tr><td>Khatib Jumat</td><td>:</td><td>${khtJmt}</td></tr>
-                        <tr><td>Imam Sholat</td><td>:</td><td>${immJmt}</td></tr>
-                        <tr><td>Bilal / Muadzin</td><td>:</td><td>${bilJmt}</td></tr>
+                        <tr><td>KHATIB</td><td>:</td><td>${khtJmt}</td></tr>
+                        <tr><td>IMAM</td><td>:</td><td>${immJmt}</td></tr>
+                        <tr><td>MUADZIN</td><td>:</td><td>${bilJmt}</td></tr>
                     </table>
                 </div>
             </div>
@@ -477,8 +764,6 @@ function bangunStrukturSlideAntrian() {
             `
         });    
     }
-
-    inisialisasiPerputaranPapan();
 }
 
 function tambahkanItemGambarDinamis() {
@@ -529,82 +814,6 @@ function formatMataUangAman(teks, sembunyikanJikaNol = false) {
     let angka = bersihkanAngka(teks);
     if (angka === 0) return sembunyikanJikaNol ? "-" : "Rp 0";
     return "Rp " + angka.toLocaleString('id-ID');
-}
-
-function inisialisasiPerputaranPapan() {
-    if (slideTimeout) clearTimeout(slideTimeout);
-    if (scrollInterval) clearInterval(scrollInterval);
-    if (dataSlides.length === 0) return;
-    currentSlideIndex = 0;
-    jalankanSiklusSlider();
-}
-
-function jalankanSiklusSlider() {
-    if (isModeSholatBerlangsung || isModeMenungguIqamah || isJedaManual) return; 
-
-    const slideA = document.getElementById('slide-A');
-    const slideB = document.getElementById('slide-B');
-    if (!slideA || !slideB) return;
-
-    let targetSlide = dataSlides[currentSlideIndex];
-    let kontainerBaru = menggunakanSlideA ? slideA : slideB;
-    let kontainerLama = menggunakanSlideA ? slideB : slideA;
-
-    kontainerBaru.innerHTML = targetSlide.html;
-
-    setTimeout(() => {
-        kontainerLama.classList.remove('active');
-        kontainerBaru.classList.add('active');
-    }, 50);
-
-    setTimeout(() => {
-        aktifkanAutoScrollKonten(targetSlide.durasi); 
-    }, 1500);
-
-    slideTimeout = setTimeout(() => {
-        if (scrollInterval) clearInterval(scrollInterval);
-        currentSlideIndex++;
-        menggunakanSlideA = !menggunakanSlideA;
-
-        if (currentSlideIndex >= dataSlides.length) {
-            bangunStrukturSlideAntrian(); 
-        } else {
-            jalankanSiklusSlider(); 
-        }
-    }, targetSlide.durasi); 
-}
-
-function aktifkanAutoScrollKonten(waktuTersisaMilidetik) {
-    const elemenScroll = document.querySelector('.active .scrollable-content');
-    if (!elemenScroll || isModeSholatBerlangsung || isModeMenungguIqamah) return;
-
-    const totalJarakScroll = elemenScroll.scrollHeight - elemenScroll.clientHeight;
-    
-    if (totalJarakScroll > 0) {
-        elemenScroll.scrollTop = 0; 
-        const jedaAwal = 2000;
-        const jedaAkhir = 2000;
-        const durasiScrollAktif = waktuTersisaMilidetik - jedaAwal - jedaAkhir;
-
-        if (durasiScrollAktif > 0) {
-            setTimeout(() => {
-                let waktuMulai = null;
-                function langkahScroll(timestamp) {
-                    if (isModeSholatBerlangsung || isModeMenungguIqamah) return;
-                    if (!waktuMulai) waktuMulai = timestamp;
-                    let waktuBerjalan = timestamp - waktuMulai;
-                    let kemajuanProgres = Math.min(waktuBerjalan / durasiScrollAktif, 1);
-                    
-                    elemenScroll.scrollTop = kemajuanProgres * totalJarakScroll;
-                    
-                    if (waktuBerjalan < durasiScrollAktif) {
-                        scrollInterval = requestAnimationFrame(langkahScroll);
-                    }
-                }
-                scrollInterval = requestAnimationFrame(langkahScroll);
-            }, jedaAwal);
-        }
-    }
 }
 
 document.addEventListener('dblclick', () => {
