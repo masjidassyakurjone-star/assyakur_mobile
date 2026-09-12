@@ -487,7 +487,7 @@ function bangunStrukturSlideAntrian() {
 function tambahkanItemGambarDinamis() {
     if (DAFTAR_GAMBAR_LOKAL.length === 0) return;
     const namaFileGambar = DAFTAR_GAMBAR_LOKAL[globalImageIndex % DAFTAR_GAMBAR_LOKAL.length];
-    const urlGambarGithubTV = `https://raw.githubusercontent.com/verypriasetia/masjid-assyakur/main/image/${namaFileGambar}`;
+    const urlGambarGithubTV = `https://raw.githubusercontent.com/masjidassyakurjone-star/assyakur_mobile/main/image/${namaFileGambar}`;
     
     dataSlides.push({
         tipe: 'IMAGE_STRETCH',
